@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="survey_user_input_search" model="ir.ui.view">
+        <field name="name">survey_user_input_search</field>
+        <field name="model">survey.user_input</field>
+        <field name="arch" type="xml">
+            <search string="Search Survey">
+                <field name="survey_id"/>
+                <field name="email"/>
+                <filter name="completed" string="Completed" domain="[('state', '=', 'done')]"/>
+                <filter string="Partially completed" domain="[('state', '=', 'skip')]"/>
+                <filter string="New" domain="[('state', '=', 'new')]"/>
+                <filter string="Test" domain="[('test_entry','=', True)]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_by_survey" string="Survey" domain="[]" context="{'group_by': 'survey_id'}"/>
+                    <filter string="Email" domain="[]" context="{'group_by': 'email'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="act_partner_survey_input" model="ir.actions.act_window">
+        <field name="res_model">survey.user_input</field>
+        <field name="view_type">form</field>
+        <field name="name">Surveys</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="survey.survey_user_input_tree"></field>
+        <field name="search_view_id" ref="lead_survey.survey_user_input_search"/>
+        <!-- <field name="context">{'search_default_partner_id': active_id, 'default_partner_id': active_id}</field> -->
+    </record>
+
+    <record id="crm_case_form_view_leads_survey" model="ir.ui.view">
+        <field name="name">crm.lead.form.lead.survey</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_case_form_view_leads"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_send_survey" string="Create survey" type="object" class="oe_highlight"  attrs="{'invisible': [('id', '=', False)]}" context="{'default_email': email_from}"/>
+            </xpath>
+            <div class="oe_button_box" position="inside">
+                <button name="%(lead_survey.act_partner_survey_input)d"
+                        type="action"
+                        class="oe_stat_button oe_inline"
+                        context="{'search_default_email': email_from, 'default_email': email_from}"
+                        icon="fa-list-alt">
+                    <field name="survey_input_count"
+                           widget="statinfo"
+                           string="Surveys"/>
+                </button>
+            </div>
+        </field>
+    </record>
+
+    <record id="crm_case_form_view_oppor" model="ir.ui.view">
+        <field name="name">crm.lead.oppor.inherited.crm</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_case_form_view_oppor"/>
+        <field name="arch" type="xml">
+            <!--
+            <xpath expr="//header" position="inside">
+                <button name="action_send_survey" string="Create survey" type="object" class="oe_highlight"  attrs="{'invisible': [('id', '=', False)]}" context="{'default_email': email_from}"/>
+            </xpath>
+            -->
+            <div class="oe_button_box" position="inside">
+                <button name="%(lead_survey.act_partner_survey_input)d"
+                        type="action"
+                        class="oe_stat_button oe_inline"
+                        context="{'search_default_email': email_from, 'default_email': email_from}"
+                        icon="fa-list-alt">
+                    <field name="survey_input_count"
+                           widget="statinfo"
+                           string="Surveys"/>
+                </button>
+            </div>
+        </field>
+    </record>
+
+</odoo>
